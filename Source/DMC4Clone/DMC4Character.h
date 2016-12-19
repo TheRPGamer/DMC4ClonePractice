@@ -22,7 +22,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+    UCameraComponent* ThirdPersonCamera;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
+    USpringArmComponent* ThirdPersonSpringArm;
+protected:
+    
+private:
+    
 	
 	
 };

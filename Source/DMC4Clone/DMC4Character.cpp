@@ -9,6 +9,20 @@ ADMC4Character::ADMC4Character()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+    SetRootComponent(GetMesh());
+    ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>("ThirdPersonCamera");
+    ThirdPersonSpringArm = CreateDefaultSubobject<USpringArmComponent>("ThirdPersonSpringArm");
+    
+    ThirdPersonCamera->SetProjectionMode(ECameraProjectionMode::Perspective);
+    ThirdPersonCamera->SetFieldOfView(120.0f);
+    
+    ThirdPersonSpringArm->TargetArmLength = 300.0f;
+    ThirdPersonCamera->bUsePawnControlRotation = true;
+    ThirdPersonSpringArm->SetupAttachment(RootComponent);
+    ThirdPersonCamera->SetupAttachment(ThirdPersonSpringArm); 
+    
+    
+    
 
 }
 
@@ -16,6 +30,7 @@ ADMC4Character::ADMC4Character()
 void ADMC4Character::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 }
 
