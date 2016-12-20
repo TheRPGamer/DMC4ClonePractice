@@ -17,24 +17,38 @@ ADMC4Character::ADMC4Character()
     {
         UE_LOG(LogDMC, Warning, TEXT("No Mesh On DMC4Character. Please attach a mesh."));
     }
+    
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw= false;
     bUseControllerRotationRoll = false;
     
     ThirdPersonSpringArm = CreateDefaultSubobject<USpringArmComponent>("ThirdPersonSpringArm");
-
-    ThirdPersonSpringArm->TargetArmLength = 250.0f;
-    ThirdPersonSpringArm->bUsePawnControlRotation= true;
-    ThirdPersonSpringArm->bAbsoluteRotation = false;
-    ThirdPersonSpringArm->bInheritYaw = false;
-    ThirdPersonSpringArm->SetupAttachment(RootComponent);
-    
+    if(ThirdPersonSpringArm)
+    {
+        ThirdPersonSpringArm->SetupAttachment(RootComponent);
+        ThirdPersonSpringArm->TargetArmLength = 250.0f;
+        ThirdPersonSpringArm->bUsePawnControlRotation= true;
+        ThirdPersonSpringArm->bAbsoluteRotation = false;
+        ThirdPersonSpringArm->bAbsoluteLocation= false;
+        ThirdPersonSpringArm->bInheritYaw = false;
+        ThirdPersonSpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+    }
     
     ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>("ThirdPersonCamera");
-    ThirdPersonCamera->SetProjectionMode(ECameraProjectionMode::Perspective)  ;
-    ThirdPersonCamera->SetFieldOfView(120.0f);
-    ThirdPersonCamera->SetupAttachment(ThirdPersonSpringArm, USpringArmComponent::SocketName);
-
+    if(ThirdPersonCamera)
+    {
+        ThirdPersonCamera->SetupAttachment(ThirdPersonSpringArm, USpringArmComponent::SocketName);
+        ThirdPersonCamera->SetProjectionMode(ECameraProjectionMode::Perspective) ;
+        ThirdPersonCamera->bAbsoluteRotation = false;
+        ThirdPersonCamera->bUsePawnControlRotation = false;
+        ThirdPersonCamera->SetFieldOfView(120.0f);
+        ThirdPersonCamera->SetRelativeRotation(FRotator(-25.0f, 0, 0));
+    }
+    
+    if(GetCharacterMovement())
+    {
+        GetCharacterMovement()->bOrientRotationToMovement = true; 
+    }
 
 }
 
@@ -60,12 +74,42 @@ void ADMC4Character::SetupPlayerInputComponent(class UInputComponent* InputCompo
     if(InputComponent)
     {
         InputComponent->BindAxis("RotateCamera", this, &ADMC4Character::RotateCamera);
+        InputComponent->BindAxis("MoveForward", this, &ADMC4Character::MoveForward);
+        InputComponent->BindAxis("MoveRight", this, &ADMC4Character::MoveRight);
+    }
+    else
+    {
+        UE_LOG(LogDMC, Warning, TEXT("Input Component is null in DMC4Character")); 
     }
 }
 
 void ADMC4Character::RotateCamera(float value)
 {
     
-    if(Controller && value)
+    if(value)
+    {
         AddControllerYawInput(value);
+    }
+}
+
+void ADMC4Character::MoveForward(float value)
+{
+    if(value && Controller && ThirdPersonCamera)
+    {
+        FVector forward = ThirdPersonCamera->GetForwardVector();
+        forward.Z=0;
+        forward.Normalize();
+        AddMovementInput(forward, value);
+    }
+}
+
+void ADMC4Character::MoveRight(float value)
+{
+    if(value && Controller && ThirdPersonCamera)
+    {
+        FVector right = ThirdPersonCamera->GetRightVector();
+        right.Z=0;
+        right.Normalize();
+        AddMovementInput(right, value);
+    }
 }
