@@ -27,9 +27,9 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
     USpringArmComponent* ThirdPersonSpringArm;
 protected:
-    
 private:
-    
+    void RotateCamera(float value);
+
 	
 	
 };

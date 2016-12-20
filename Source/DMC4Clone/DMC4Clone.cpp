@@ -3,3 +3,4 @@
 #include "DMC4Clone.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, DMC4Clone, "DMC4Clone" );
+DEFINE_LOG_CATEGORY(LogDMC); 
