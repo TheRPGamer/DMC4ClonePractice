@@ -2,17 +2,20 @@
 
 #pragma once
 
-#include "GameFramework/Character.h"
-#include "DMC4Enemy.generated.h"
+#include "DMC4Character.h"
+#include "DMC4EnemyCharacter.generated.h"
 
+/*
+ * Base class for all enemies in DMC4Clone 
+ */
 UCLASS()
-class DMC4CLONE_API ADMC4Enemy : public ACharacter
+class DMC4CLONE_API ADMC4EnemyCharacter : public ADMC4Character
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ADMC4Enemy();
+	ADMC4EnemyCharacter();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

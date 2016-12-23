@@ -2,14 +2,14 @@
 
 #include "DMC4Clone.h"
 #include "EnemySpawner.h"
-#include "DMC4Enemy.h"
+#include "DMC4EnemyCharacter.h"
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-    static ConstructorHelpers::FObjectFinder<UBlueprint> EnemyBP(TEXT("Blueprint'/Game/TestEnemy.TestEnemy'"));
+    static ConstructorHelpers::FObjectFinder<UBlueprint> EnemyBP(TEXT("Blueprint'/Game/TestEnemyCharacter.TestEnemyCharacter'"));
 
     if(EnemyBP.Object)
     {
@@ -73,6 +73,6 @@ void AEnemySpawner::SpawnEnemyAtLocation()
         FVector randomLocation = GetRandomLocationFromPlayer();
         FRotator enemyRotation(0.0f, 0.0f, 0.0f);
         //UClass* enemyClass = (UClass*)EnemyBPClass;
-        SpawnEnemyBP<ADMC4Enemy>(world, testClass, randomLocation, enemyRotation);
+        SpawnEnemyBP<ADMC4EnemyCharacter>(world, testClass, randomLocation, enemyRotation);
     }
 }

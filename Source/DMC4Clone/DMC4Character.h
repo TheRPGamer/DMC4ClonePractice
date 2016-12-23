@@ -5,6 +5,9 @@
 #include "GameFramework/Character.h"
 #include "DMC4Character.generated.h"
 
+/*
+ * Base class of both playable characters and enemy characteres in DMC4Clone
+ */
 UCLASS()
 class DMC4CLONE_API ADMC4Character : public ACharacter
 {
@@ -22,31 +25,26 @@ public:
     
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-    
-    FORCEINLINE UCameraComponent* GetThirdPersonCamera() const
+    UFUNCTION(BlueprintCallable, Category = "StatGetters")
+    int32 GetMaxHP() const
     {
-        return ThirdPersonCamera;
+        return MaxHP;
     }
     
-
-private:
-    //Rotates Third Person Camera around Character like orbit camera
-    void RotateCamera(float value);
+    int32 GetCurrentHP() const
+    {
+        return CurrentHP;
+    }
     
-    //Moves character forward based on Third Person Camera forward vector. W for forward, S for back.
-    void MoveForward(float value);
+protected:
+    //Maximum HP of character
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Character Stats", meta = (AllowProtectedAccess = "true"))
+    int32 MaxHP;
     
-    //Moves character right based on Third Person Camera current right vector. D for right, A for left. 
-    void MoveRight(float value);
-    
-    //Camera Component in 3rd Person Perspective to character
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-    UCameraComponent* ThirdPersonCamera = nullptr;
-    
-    //Camera Boom to 3rd Person Camera
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-    USpringArmComponent* ThirdPersonSpringArm = nullptr;
-
-	
+    //Current HP of Character
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Character Stats", meta = (AllowProtectedAccess = "true"))
+    int32 CurrentHP;
+                                                                                          
+                                                                                          
 	
 };

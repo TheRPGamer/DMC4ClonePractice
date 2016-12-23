@@ -56,7 +56,7 @@ private:
     
     //UClass pointer of the Test Enemy Class to use with SpawnBP
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "TestEnemyClass", meta = (AllowPrivateAccess = "true"))
-    TSubclassOf<class ADMC4Enemy> EnemyBPClass;
+    TSubclassOf<class ADMC4EnemyCharacter> EnemyBPClass;
     
     //Timer to spawn enemies every few seconds at random locations from player
     FTimerHandle SpawnEnemyTimer; 
