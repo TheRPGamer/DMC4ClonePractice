@@ -94,7 +94,7 @@ void ADMC4Character::RotateCamera(float value)
 
 void ADMC4Character::MoveForward(float value)
 {
-    if(value && Controller && ThirdPersonCamera)
+    if(value && ThirdPersonCamera)
     {
         FVector forward = ThirdPersonCamera->GetForwardVector();
         forward.Z=0;
@@ -105,7 +105,7 @@ void ADMC4Character::MoveForward(float value)
 
 void ADMC4Character::MoveRight(float value)
 {
-    if(value && Controller && ThirdPersonCamera)
+    if(value && ThirdPersonCamera)
     {
         FVector right = ThirdPersonCamera->GetRightVector();
         right.Z=0;

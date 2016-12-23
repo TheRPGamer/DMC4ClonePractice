@@ -24,7 +24,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
     
     FORCEINLINE UCameraComponent* GetThirdPersonCamera() const
-    {return ThirdPersonCamera;}
+    {
+        return ThirdPersonCamera;
+    }
     
 
 private:
