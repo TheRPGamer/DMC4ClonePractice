@@ -5,9 +5,8 @@
 #include "DMC4Character.h"
 #include "DMC4EnemyCharacter.generated.h"
 
-/*
- * Base class for all enemies in DMC4Clone 
- */
+//Base class for all Enemies in DMC4 
+
 UCLASS()
 class DMC4CLONE_API ADMC4EnemyCharacter : public ADMC4Character
 {

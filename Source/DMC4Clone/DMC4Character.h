@@ -5,9 +5,8 @@
 #include "GameFramework/Character.h"
 #include "DMC4Character.generated.h"
 
-/*
- * Base class of both playable characters and enemy characteres in DMC4Clone
- */
+//Base class for all characters in DMC4 to inherit from
+
 UCLASS()
 class DMC4CLONE_API ADMC4Character : public ACharacter
 {
@@ -31,6 +30,7 @@ public:
         return MaxHP;
     }
     
+    UFUNCTION(BlueprintCallable, Category = "StatGetters")
     int32 GetCurrentHP() const
     {
         return CurrentHP;

@@ -9,14 +9,6 @@ ADMC4PlayerCharacter::ADMC4PlayerCharacter()
 {
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-    if(GetCapsuleComponent())
-    {
-        SetRootComponent(GetCapsuleComponent());
-    }
-    else
-    {
-        UE_LOG(LogDMC, Warning, TEXT("No Mesh On DMC4Character. Please attach a mesh."));
-    }
     
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw= false;
@@ -31,7 +23,7 @@ ADMC4PlayerCharacter::ADMC4PlayerCharacter()
         ThirdPersonSpringArm->bAbsoluteRotation = false;
         ThirdPersonSpringArm->bAbsoluteLocation= false;
         ThirdPersonSpringArm->bInheritYaw = false;
-        ThirdPersonSpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+        ThirdPersonSpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 250.0f));
     }
     
     ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>("ThirdPersonCamera");
@@ -112,4 +104,15 @@ void ADMC4PlayerCharacter::MoveRight(float value)
         right.Normalize();
         AddMovementInput(right, value);
     }
+}
+
+FVector ADMC4PlayerCharacter::GetRandomLocationFromPlayer() const
+{
+    FVector playerLocation = GetPlayerCurrentLocation();
+    playerLocation.X = FMath::RandRange(playerLocation.X+300.0f, playerLocation.X+1300.0f);
+    playerLocation.Y = FMath::RandRange(playerLocation.Y+300.0f, playerLocation.Y+1300.0f);
+    
+    playerLocation.Z = 200.0f;
+    
+    return playerLocation;
 }

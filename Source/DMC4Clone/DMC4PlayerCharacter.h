@@ -5,9 +5,8 @@
 #include "DMC4Character.h"
 #include "DMC4PlayerCharacter.generated.h"
 
-/*
- * Base class of all playable characters in DMC4Clone
- */
+//Base class for all playable characters in DMC4
+
 UCLASS()
 class DMC4CLONE_API ADMC4PlayerCharacter : public ADMC4Character
 {
@@ -31,7 +30,15 @@ public:
         return ThirdPersonCamera;
     }
     
+    UFUNCTION(BlueprintCallable, Category = "PlayerLocation")
+    FVector GetPlayerCurrentLocation() const
+    {
+        return GetActorLocation(RootComponent);
+    }
     
+    //returns a random location within an offset radisu of the player
+    UFUNCTION(BlueprintCallable, Category = "PlayerLocation")
+    FVector GetRandomLocationFromPlayer() const;
 private:
     //Rotates Third Person Camera around Character like orbit camera
     void RotateCamera(float value);
