@@ -68,6 +68,9 @@ void ADMC4PlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Inpu
         InputComponent->BindAxis("RotateCamera", this, &ADMC4PlayerCharacter::RotateCamera);
         InputComponent->BindAxis("MoveForward", this, &ADMC4PlayerCharacter::MoveForward);
         InputComponent->BindAxis("MoveRight", this, &ADMC4PlayerCharacter::MoveRight);
+        
+        InputComponent->BindAction("LockOn", IE_Pressed, this, &ADMC4PlayerCharacter::LockOnPressed);
+        InputComponent->BindAction("LockOn", IE_Released, this, &ADMC4PlayerCharacter::LockOnReleased);
     }
     else
     {
@@ -115,4 +118,68 @@ FVector ADMC4PlayerCharacter::GetRandomLocationFromPlayer() const
     playerLocation.Z = 200.0f;
     
     return playerLocation;
+}
+
+void ADMC4PlayerCharacter::BindOnEnemySpawnEvent(ADMC4EnemyCharacter* enemy)
+{
+    if(enemy)
+    {
+        ArrayEnemies.Add(enemy); 
+    }
+}
+
+ADMC4EnemyCharacter* ADMC4PlayerCharacter::GetClosestEnemy() const
+{
+    ADMC4EnemyCharacter* closestEnemy = ArrayEnemies[0];
+    float closestDistance = GetSquaredDistanceTo(closestEnemy);
+    for(auto& enemy : ArrayEnemies)
+    {
+        float distance = GetSquaredDistanceTo(enemy);
+        if(distance < closestDistance)
+        {
+            closestDistance = distance;
+            closestEnemy = enemy; 
+        }
+    }
+    
+    return closestEnemy;
+    
+}
+
+void ADMC4PlayerCharacter::LockOnPressed()
+{
+    bLockedOn = true; 
+    if(ArrayEnemies.Num() == 0)
+    {
+        return;
+    }
+    OrientPlayerToEnemy(); 
+    
+}
+
+void ADMC4PlayerCharacter::LockOnReleased()
+{
+    bLockedOn = false;
+}
+void ADMC4PlayerCharacter::OrientPlayerToEnemy()
+{
+    auto enemy = GetClosestEnemy();
+    FVector vector = enemy->GetActorLocation() - GetActorLocation();
+    vector.Normalize();
+    FVector forward = GetActorForwardVector();
+    float dotProduct = FVector::DotProduct(vector, forward);
+    float turnAngle = FMath::Acos(dotProduct); 
+    turnAngle = FMath::RadiansToDegrees(turnAngle);
+    FVector crossProduct = FVector::CrossProduct(vector, forward);
+    FRotator rotation = Controller->GetControlRotation();
+    FRotator currRotation =Controller->GetControlRotation();
+    if(crossProduct.Z < 0)
+    {
+        rotation.Yaw += turnAngle;
+    }
+    else if(crossProduct.Z > 0)
+    {
+        rotation.Yaw-=turnAngle;
+    }
+    Controller->SetControlRotation(rotation);
 }
