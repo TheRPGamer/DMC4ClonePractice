@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DMC4Clone.h"
+
+#include "DMC4EnemySpawner.h"
+
 #include "DMC4PlayerCharacter.h"
 
 
@@ -44,7 +47,6 @@ ADMC4PlayerCharacter::ADMC4PlayerCharacter()
     
 }
 
-// Called when the game starts or when spawned
 void ADMC4PlayerCharacter::BeginPlay()
 {
     Super::BeginPlay();
@@ -52,30 +54,59 @@ void ADMC4PlayerCharacter::BeginPlay()
     
 }
 
-// Called every frame
 void ADMC4PlayerCharacter::Tick( float DeltaTime )
 {
     Super::Tick( DeltaTime );
     
 }
 
-// Called to bind functionality to input
-void ADMC4PlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void ADMC4PlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-    Super::SetupPlayerInputComponent(InputComponent);
-    if(InputComponent)
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    if(PlayerInputComponent)
     {
-        InputComponent->BindAxis("RotateCamera", this, &ADMC4PlayerCharacter::RotateCamera);
-        InputComponent->BindAxis("MoveForward", this, &ADMC4PlayerCharacter::MoveForward);
-        InputComponent->BindAxis("MoveRight", this, &ADMC4PlayerCharacter::MoveRight);
+		PlayerInputComponent->BindAxis("RotateCamera", this, &ADMC4PlayerCharacter::RotateCamera);
+		PlayerInputComponent->BindAxis("MoveForward", this, &ADMC4PlayerCharacter::MoveForward);
+		PlayerInputComponent->BindAxis("MoveRight", this, &ADMC4PlayerCharacter::MoveRight);
         
-        InputComponent->BindAction("LockOn", IE_Pressed, this, &ADMC4PlayerCharacter::LockOnPressed);
-        InputComponent->BindAction("LockOn", IE_Released, this, &ADMC4PlayerCharacter::LockOnReleased);
+		PlayerInputComponent->BindAction("LockOn", IE_Pressed, this, &ADMC4PlayerCharacter::LockOnPressed);
+		PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ADMC4PlayerCharacter::LockOnReleased);
     }
     else
     {
         UE_LOG(LogDMC, Warning, TEXT("Input Component is null in DMC4Character"));
     }
+}
+
+void ADMC4PlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (NewController->IsPlayerController())
+	{
+		// TODO: LOG you shall not use the player character with any controller besides a player controller
+	}
+
+	auto World = GetWorld();
+	if (World)
+	{
+		for (TActorIterator<ADMC4EnemySpawner> ActorItr(World); ActorItr; ++ActorItr)
+		{
+			(*ActorItr)->OnEnemySpawnedEvent.AddUObject(this, &ADMC4PlayerCharacter::OnEnemySpawnedEvent);
+		}
+	}
+}
+
+void ADMC4PlayerCharacter::OnEnemySpawnedEvent_Implementation(ADMC4EnemyCharacter* EnemyCharacter)
+{
+	// we expect a valid character at all times
+	check(EnemyCharacter); 
+
+	if (GEngine && EnemyCharacter)
+	{
+		// temporary testing
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("Enemy %s spawned."), *EnemyCharacter->GetName()));
+	}
 }
 
 void ADMC4PlayerCharacter::RotateCamera(float value)
@@ -120,14 +151,6 @@ FVector ADMC4PlayerCharacter::GetRandomLocationFromPlayer() const
     return playerLocation;
 }
 
-void ADMC4PlayerCharacter::BindOnEnemySpawnEvent(ADMC4EnemyCharacter* enemy)
-{
-    if(enemy)
-    {
-        ArrayEnemies.Add(enemy); 
-    }
-}
-
 ADMC4EnemyCharacter* ADMC4PlayerCharacter::GetClosestEnemy() const
 {
     ADMC4EnemyCharacter* closestEnemy = ArrayEnemies[0];
@@ -148,7 +171,7 @@ ADMC4EnemyCharacter* ADMC4PlayerCharacter::GetClosestEnemy() const
 
 void ADMC4PlayerCharacter::LockOnPressed()
 {
-    bLockedOn = true; 
+ 
     if(ArrayEnemies.Num() == 0)
     {
         return;
@@ -159,7 +182,7 @@ void ADMC4PlayerCharacter::LockOnPressed()
 
 void ADMC4PlayerCharacter::LockOnReleased()
 {
-    bLockedOn = false;
+
 }
 void ADMC4PlayerCharacter::OrientPlayerToEnemy()
 {

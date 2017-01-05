@@ -28,10 +28,3 @@ void ADMC4Character::Tick( float DeltaTime )
 
 }
 
-// Called to bind functionality to input
-void ADMC4Character::SetupPlayerInputComponent(class UInputComponent* InputComponent)
-{
-	Super::SetupPlayerInputComponent(InputComponent);
-    
-}
-

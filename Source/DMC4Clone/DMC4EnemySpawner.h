@@ -6,9 +6,7 @@
 #include "DMC4EnemyCharacter.h"
 #include "DMC4EnemySpawner.generated.h"
 
-//Actor used to spawn all enemies in DMC4.
-//EnemyBPClass must be set in Blueprints to select the enemy to be spanwed.
-//As of now, only one type of enemy can be spawned per actor. 
+
 DECLARE_EVENT_OneParam(ADMC4EnemySpawner, FOnEnemySpawnedEvent, ADMC4EnemyCharacter*);
 
 UENUM()
@@ -37,6 +35,10 @@ struct FDMC4EnemySpawnInfo
 
 };
 
+
+//Actor used to spawn all enemies in DMC4.
+//EnemyBPClass must be set in Blueprints to select the enemy to be spanwed.
+//As of now, only one type of enemy can be spawned per actor. 
 UCLASS()
 class DMC4CLONE_API ADMC4EnemySpawner : public AActor
 {
@@ -97,7 +99,7 @@ private:
     USphereComponent* Sphere = nullptr;
     
     //radius of the Spawn Sphere
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "SpawnSphere", meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnSphere", meta = (AllowPrivateAccess = "true"))
     float SphereRadius = 100.0f;
     
     //Keeps track of the player 

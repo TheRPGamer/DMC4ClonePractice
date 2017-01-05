@@ -24,8 +24,9 @@ void ADMC4EnemySpawner::PostEditChangeProperty(FPropertyChangedEvent& propertyCh
     Super::PostEditChangeProperty(propertyChangedEvent);
     if(propertyChangedEvent.Property)
     {
+		// reflect sphere radius changes in the editor
         auto propertyName = propertyChangedEvent.Property->GetFName();
-        if(propertyName == GET_MEMBER_NAME_CHECKED(ADMC4EnemySpawner, Sphere))
+        if(propertyName == GET_MEMBER_NAME_CHECKED(ADMC4EnemySpawner, SphereRadius))
         {
             Sphere->SetSphereRadius(SphereRadius);
         }
@@ -38,15 +39,8 @@ void ADMC4EnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
     PrimaryActorTick.TickInterval = TickInterval;
-    //Wouldn't this prevent the need for the above function?
+
     Sphere->SetSphereRadius(SphereRadius);
-    
-    auto character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-    if(character)
-    {
-        Player = Cast<ADMC4PlayerCharacter>(character);
-    }
-    
 }
 
 // Called every frame
@@ -66,7 +60,7 @@ void ADMC4EnemySpawner::SpawnEnemy()
     if(world)
     {
         FVector location = GetRandomLocationWithinSpawnSphere();
-        FRotator rotation(0.0f, 0.0f, 0.0f);
+        FRotator rotation = FRotator::ZeroRotator;
         if(EnemyClassesToSpawn.Num() > 0)
         {
             for(auto const& spawnInfo : EnemyClassesToSpawn)
@@ -78,15 +72,11 @@ void ADMC4EnemySpawner::SpawnEnemy()
                     spawnParams.bDeferConstruction = false;
                     auto enemy = Cast<ADMC4EnemyCharacter>(world->SpawnActor(spawnInfo.EnemyClass, &location, &rotation, spawnParams));
                     UE_LOG(LogTemp, Log,TEXT("The value of enemy is %p"), enemy);
-                    //Where Delegate SHOULD broadcast, but I'm not
                     if(enemy)
                     {
-                        //FUNCTION NAME IS NOT WHAT IT SEEMS
-                        //Adds the enemy that's just spawnedto ArrayEnemy in Player
-                        Player->BindOnEnemySpawnEvent(enemy);
                         ++SpawnLimitCurrent;
                         ++SpawnMaxCurrent;
-                        //OnEnemySpawnedEvent.Broadcast(enemy);
+                        OnEnemySpawnedEvent.Broadcast(enemy);
                     }
                     
                     

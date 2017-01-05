@@ -5,8 +5,43 @@
 #include "DMC4EnemyCharacter.h"
 #include "DMC4PlayerCharacter.generated.h"
 
-//Base class for all playable characters in DMC4
 
+
+
+//Provides a way to aquire and release LockOn Mode for the player character. 
+//A player can enter lock on mode at all times, even when there is no character to lock.
+USTRUCT()
+struct DMC4CLONE_API FDMC4LockedCharacter
+{
+	GENERATED_BODY()
+
+public:	
+	//Aquires a lock. Note param CharToLock is allowed to be null as we do not need a character to enter LockOn mode
+	void AquireLock(ADMC4EnemyCharacter* CharToLock = nullptr) { bLockedOn = true, LockedCharacter = CharToLock; }
+
+	//Releases the current lock and resets the locked character to nullptr in any case
+	void ReleaseLock() { bLockedOn = false; LockedCharacter = nullptr; }
+
+	//Returns true if lock is on (weather a char is locked or not)
+	bool IsLocked() { return bLockedOn;  }
+
+	//Gets the currently locked character. Returns nullptr if none is locked
+	FORCEINLINE ADMC4EnemyCharacter* Get() const { return LockedCharacter; }
+		
+
+private:
+	//Determines whether or not character is locked on to an enemy hence what attacks the player can do	
+	bool bLockedOn = false;
+
+	// the actual locked character (note we need to declare this UPROPERTY() so the garbage collection sees we reference it here
+	UPROPERTY()
+	ADMC4EnemyCharacter* LockedCharacter = nullptr;
+};
+
+
+
+
+//Defines a base for all characters that can be possessed by a player controller.
 UCLASS()
 class DMC4CLONE_API ADMC4PlayerCharacter : public ADMC4Character
 {
@@ -19,31 +54,34 @@ public:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
     
+	virtual void PossessedBy(AController* InController) override;
+	
     // Called every frame
     virtual void Tick( float DeltaSeconds ) override;
     
     // Called to bind functionality to input
-    virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     
+	UFUNCTION(BlueprintNativeEvent, Category = "DMC4PlayerCharacter")
+	void OnEnemySpawnedEvent(ADMC4EnemyCharacter* EnemyCharacter);
+
+
     FORCEINLINE UCameraComponent* GetThirdPersonCamera() const
     {
         return ThirdPersonCamera;
     }
     
-    UFUNCTION(BlueprintCallable, Category = "PlayerLocation")
+    UFUNCTION(BlueprintCallable, Category = "DMC4PlayerCharacter")
     FVector GetPlayerCurrentLocation() const
     {
         return GetActorLocation(RootComponent);
     }
     
     //returns a random location within an offset radisu of the player
-    UFUNCTION(BlueprintCallable, Category = "PlayerLocation")
+    UFUNCTION(BlueprintCallable, Category = "DMC4PlayerCharacter")
     FVector GetRandomLocationFromPlayer() const;
     
-    //Function to be bound to Enemy Spawner Delegate
-    //Adds the enemy that is spawned to ArrayEnemies
-    UFUNCTION()
-    void BindOnEnemySpawnEvent(ADMC4EnemyCharacter* enemy);
+
 private:
     //Rotates Third Person Camera around Character like orbit camera
     void RotateCamera(float value);
@@ -75,13 +113,12 @@ private:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
     USpringArmComponent* ThirdPersonSpringArm = nullptr;
     
-    //Array of all enemies that have been spawned on current level 
+    //Array of all enemies that have been spawned on current level (note we need to use UPROPERTY() here so the garbage collection sees our references)
+	UPROPERTY()
     TArray<ADMC4EnemyCharacter*> ArrayEnemies;
     
-    //Determines whether or not character is locked on to an enemy
-    //Determines what attacks the player can do
-    bool bLockedOn = false;
-    
-    
+	//The character that is currently locked
+	FDMC4LockedCharacter LockedCharacter;  
+
     
 };
